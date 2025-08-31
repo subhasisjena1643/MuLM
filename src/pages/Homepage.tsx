@@ -58,7 +58,7 @@ export const Homepage: React.FC<HomepageProps> = ({ isDark, onThemeToggle }) => 
     }
 
     setIsGenerating(true);
-    setGenerationProgress('🧠 Initializing AI workflow builder...');
+    setGenerationProgress('🧠 Initializing block library system...');
     
     try {
       // Debug logging

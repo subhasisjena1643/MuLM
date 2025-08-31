@@ -1502,7 +1502,7 @@ const EnhancedMoEWorkspace: React.FC<WorkspaceProps> = ({ isDark, onThemeToggle 
             <div className="space-y-3">
               <label className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
                 <span>{Icons.Magic}</span>
-                AI Workflow Builder
+                Block Library
                 <span className="text-xs bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 px-2 py-1 rounded">
                   OpenAI Powered
                 </span>
@@ -1761,6 +1761,12 @@ const EnhancedMoEWorkspace: React.FC<WorkspaceProps> = ({ isDark, onThemeToggle 
               onNodeClick={onNodeClick}
               onNodeDoubleClick={onNodeDoubleClick}
               nodeTypes={nodeTypes}
+              defaultEdgeOptions={{
+                animated: true,
+                style: { stroke: '#3B82F6', strokeWidth: 2 },
+                type: 'smoothstep'
+              }}
+              connectionLineStyle={{ stroke: '#3B82F6', strokeWidth: 2 }}
               fitView
               attributionPosition="bottom-left"
               className="bg-gray-50 dark:bg-gray-900"

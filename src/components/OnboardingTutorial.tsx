@@ -16,7 +16,7 @@ const tutorialSteps: TutorialStep[] = [
   {
     id: 'welcome',
     title: '🎉 Welcome to µLM AI Playground!',
-    description: 'The most powerful visual AI workflow builder. Build, connect, and deploy AI workflows in minutes, not hours.',
+    description: 'The most powerful visual block library system. Build, connect, and deploy AI workflows in minutes, not hours.',
     action: 'Get started with your first workflow',
     highlight: 'Perfect for hackathons, prototypes, and production apps'
   },
