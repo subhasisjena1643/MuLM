@@ -106,11 +106,17 @@ export const AIBlockGenerator: React.FC<AIBlockGeneratorProps> = ({
   };
 
   const handleAddToWorkflow = () => {
+    console.log('🚀 handleAddToWorkflow called');
+    console.log('📦 generatedBlock:', generatedBlock);
     if (generatedBlock) {
+      console.log('📤 Calling onBlockGenerated with:', generatedBlock.block);
       onBlockGenerated(generatedBlock.block);
       setIsOpen(false);
       setGeneratedBlock(null);
       setPrompt('');
+      console.log('✅ Block sent to workflow!');
+    } else {
+      console.error('❌ No generated block to add!');
     }
   };
 

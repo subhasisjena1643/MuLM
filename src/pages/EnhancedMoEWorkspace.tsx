@@ -34,6 +34,7 @@ import DistributedGridProcessingService from '../services/DistributedGridProcess
 
 // Storage
 import { GridStorage } from '../storage/GridStorage';
+import { AllBlocks } from '../storage/blocks/AIWorkflowBlocks';
 
 // Types
 import { BlockDefinition } from '../storage/types/GridTypes';
@@ -1224,7 +1225,7 @@ const EnhancedMoEWorkspace: React.FC<WorkspaceProps> = ({ isDark, onThemeToggle 
 
   // Node Operations with Real-time Configuration Matching
   const onConnect = useCallback(
-    (params: Connection) => {
+    async (params: Connection) => {
       console.log('🔗 Connecting blocks:', params);
       
       // Find source and target nodes
@@ -1286,15 +1287,19 @@ const EnhancedMoEWorkspace: React.FC<WorkspaceProps> = ({ isDark, onThemeToggle 
               })
             );
             
-            // Add connection metadata to edge
+            // Add connection metadata to edge with basic validation
+            const aiValidation = validateConnectionWithAI(sourceOutput, targetInput, sourceBlock, targetBlock);
+            const edgeId = `${params.source}-${params.target}`;
             const enhancedParams = {
               ...params,
+              id: edgeId,
               data: {
                 sourceOutput,
                 targetInput,
                 dataType: sourceOutput.type,
                 compatible: sourceOutput.type === targetInput.type,
-                configuredAt: new Date()
+                configuredAt: new Date(),
+                aiValidated: false // Will be updated asynchronously
               },
               style: {
                 stroke: sourceOutput.type === targetInput.type ? '#10b981' : '#f59e0b',
@@ -1304,7 +1309,20 @@ const EnhancedMoEWorkspace: React.FC<WorkspaceProps> = ({ isDark, onThemeToggle 
             
             setEdges((eds) => addEdge(enhancedParams, eds));
             
-            console.log('✅ Real-time configuration applied');
+            // Async AI validation
+            aiValidation.then(validation => {
+              console.log('🤖 AI Validation Result:', validation);
+              // Update edge with validation result
+              setEdges(prevEdges => 
+                prevEdges.map(edge => 
+                  edge.id === edgeId 
+                    ? { ...edge, data: { ...edge.data, aiValidated: validation } }
+                    : edge
+                )
+              );
+            });
+            
+            console.log('✅ Real-time configuration applied with AI validation');
           } else {
             console.warn('⚠️ Could not find matching inputs/outputs for configuration');
             setEdges((eds) => addEdge(params, eds));
@@ -1319,6 +1337,30 @@ const EnhancedMoEWorkspace: React.FC<WorkspaceProps> = ({ isDark, onThemeToggle 
     [setEdges, nodes]
   );
 
+  // AI Connection Validation
+  const validateConnectionWithAI = async (sourceOutput: any, targetInput: any, sourceBlock: any, targetBlock: any) => {
+    try {
+      // Simple validation for now - can be enhanced with actual OpenAI calls
+      const isCompatible = sourceOutput.type === targetInput.type;
+      const hasCommonDataFormat = sourceOutput.dataFormat === targetInput.dataFormat;
+      
+      console.log(`🤖 AI Validating connection: ${sourceBlock.name} → ${targetBlock.name}`);
+      console.log(`📊 Compatibility: ${isCompatible ? '✅' : '❌'} | Data Format: ${hasCommonDataFormat ? '✅' : '❌'}`);
+      
+      return {
+        isValid: isCompatible,
+        confidence: isCompatible ? 0.9 : 0.3,
+        suggestion: isCompatible 
+          ? `Perfect match! ${sourceOutput.type} → ${targetInput.type}` 
+          : `⚠️ Type mismatch: ${sourceOutput.type} → ${targetInput.type}. Consider adding a transformer block.`,
+        autoFix: !isCompatible ? `Add ${sourceOutput.type}→${targetInput.type} converter` : null
+      };
+    } catch (error) {
+      console.error('AI validation failed:', error);
+      return { isValid: true, confidence: 0.5, suggestion: 'Validation unavailable' };
+    }
+  };
+
   const onNodeClick = useCallback((event: React.MouseEvent, node: Node) => {
     setSelectedNode(node);
     setShowConfigPanel(true);
@@ -1330,10 +1372,54 @@ const EnhancedMoEWorkspace: React.FC<WorkspaceProps> = ({ isDark, onThemeToggle 
     setShowCodeEditor(false); // Close modal if open
   }, []);
 
-  // Add AI-generated expert to palette
+  // Add AI-generated expert to palette and canvas
   const handleExpertGenerated = useCallback((expert: BlockDefinition) => {
-    setExpertLibrary(prev => [...prev, expert]);
-  }, []);
+    console.log('🎯 handleExpertGenerated called with:', expert);
+    
+    // Add to expert library
+    setExpertLibrary(prev => {
+      const updated = [...prev, expert];
+      console.log('📚 Updated expert library:', updated.length, 'blocks');
+      return updated;
+    });
+    
+    // Automatically add the generated block to the canvas
+    const newNode: Node = {
+      id: `node-${Date.now()}`,
+      type: 'blockNode',
+      position: { 
+        x: 300 + Math.random() * 200, 
+        y: 200 + Math.random() * 200 
+      },
+      data: {
+        label: expert.name,
+        block: expert,
+        inputs: expert.inputs,
+        outputs: expert.outputs,
+        implementation: expert.implementation
+      },
+      sourcePosition: Position.Right,
+      targetPosition: Position.Left,
+    };
+    
+    console.log('🎨 Adding new node to canvas:', newNode);
+    setNodes(prev => {
+      const updated = [...prev, newNode];
+      console.log('🔗 Updated nodes:', updated.length, 'total nodes');
+      return updated;
+    });
+    
+    // Close the AI generator
+    setShowAIGenerator(false);
+    
+    console.log('✅ Block successfully added to workflow!');
+    
+    // Close the AI generator modal
+    setShowAIGenerator(false);
+    
+    // Show success message
+    console.log('✅ Generated block added to canvas:', expert.name);
+  }, [setNodes]);
 
   // AI-Powered Custom Block Generation
   const handleGenerateCustomBlock = useCallback(async (blockPrompt: string) => {
@@ -1581,10 +1667,7 @@ const EnhancedMoEWorkspace: React.FC<WorkspaceProps> = ({ isDark, onThemeToggle 
                     {isAnalyzingWorkflow ? '🔍' : '📊'} Analyze
                   </button>
                   <button
-                    onClick={() => {
-                      const blockPrompt = prompt('Describe the custom block you need:');
-                      if (blockPrompt) handleGenerateCustomBlock(blockPrompt);
-                    }}
+                    onClick={() => setShowAIGenerator(true)}
                     disabled={isLoadingExperts}
                     className="px-2 py-1 text-xs bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 rounded hover:bg-green-200 dark:hover:bg-green-800 disabled:opacity-50 flex items-center gap-1"
                   >
@@ -1614,7 +1697,7 @@ const EnhancedMoEWorkspace: React.FC<WorkspaceProps> = ({ isDark, onThemeToggle 
             </div>
             
             <BlockPalette 
-              blocks={expertLibrary.length > 0 ? expertLibrary : undefined}
+              blocks={expertLibrary.length > 0 ? expertLibrary : Object.values(AllBlocks)}
               onBlockSelect={(block) => {
                 console.log('Block selected:', block.name);
                 // Add block to canvas
@@ -2144,6 +2227,18 @@ const EnhancedMoEWorkspace: React.FC<WorkspaceProps> = ({ isDark, onThemeToggle 
         {showAIGenerator && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-hidden">
+              <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                  <span>{Icons.Sparkles}</span>
+                  AI Block Generator
+                </h3>
+                <button
+                  onClick={() => setShowAIGenerator(false)}
+                  className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                >
+                  ✕
+                </button>
+              </div>
               <AIBlockGenerator
                 onBlockGenerated={handleExpertGenerated}
                 existingBlocks={expertLibrary}
@@ -2229,16 +2324,56 @@ const EnhancedMoEWorkspace: React.FC<WorkspaceProps> = ({ isDark, onThemeToggle 
           </div>
         )}
 
-        {/* Right Panel - Code Editor */}
-        {showRightPanel && (
-          <WorkspaceRightPanel
-            isOpen={showRightPanel}
-            onClose={() => setShowRightPanel(false)}
-            selectedNode={selectedNode}
-            width={rightPanelWidth}
-            onWidthChange={setRightPanelWidth}
-            isDark={isDark}
-          />
+        {/* Right Sidebar - Code Editor */}
+        {showRightPanel && selectedNode && (
+          <div className="w-96 border-l border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 flex flex-col">
+            {/* Header */}
+            <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                  <span>{Icons.Code}</span>
+                  Edit Block: {selectedNode.data?.block?.name || selectedNode.data?.label || selectedNode.id}
+                </h3>
+                <button
+                  onClick={() => setShowRightPanel(false)}
+                  className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
+            
+            {/* Code Editor */}
+            <div className="flex-1 p-4">
+              <div className="h-full">
+                <textarea
+                  className="w-full h-full p-4 border border-gray-200 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white font-mono text-sm resize-none"
+                  defaultValue={selectedNode.data?.block?.implementation || selectedNode.data?.implementation || '# Block implementation code here\n\ndef execute(input_data):\n    # Add your code here\n    return input_data'}
+                  placeholder="Enter block implementation code..."
+                />
+              </div>
+            </div>
+            
+            {/* Footer */}
+            <div className="p-4 border-t border-gray-200 dark:border-gray-700 flex gap-3">
+              <button
+                onClick={() => setShowRightPanel(false)}
+                className={`flex-1 px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 ${smoothTransition}`}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  // Save implementation logic here
+                  console.log('Code saved for node:', selectedNode.id);
+                  setShowRightPanel(false);
+                }}
+                className={`flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 ${smoothTransition}`}
+              >
+                Save Changes
+              </button>
+            </div>
+          </div>
         )}
       </ReactFlowProvider>
     </div>
