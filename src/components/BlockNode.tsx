@@ -8,6 +8,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Handle, Position, NodeProps } from 'reactflow';
 import { Settings, Play, Pause, AlertCircle, CheckCircle, Clock, Info, X, Maximize, Minimize } from 'lucide-react';
+import { AdvancedCodeEditor } from './editor/AdvancedCodeEditor';
 import { BlockDefinition, Port } from '../storage/types/GridTypes';
 
 interface BlockNodeData {
@@ -155,6 +156,8 @@ const BlockNode: React.FC<NodeProps<BlockNodeData>> = ({ data, selected, id }) =
   const [isExpanded, setIsExpanded] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
   const [showSourceCode, setShowSourceCode] = useState(false);
+  const [isEditingCode, setIsEditingCode] = useState(false);
+  const [editedCode, setEditedCode] = useState('');
   const [localConfig, setLocalConfig] = useState(() => {
     return data?.config || (blockData && blockData.config) || {};
   });
@@ -275,24 +278,26 @@ const BlockNode: React.FC<NodeProps<BlockNodeData>> = ({ data, selected, id }) =
     }
   };
 
-  // Handle double-click for input blocks to trigger file upload
+  // Handle double-click for input blocks to trigger file upload, for other blocks to open code editor
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   const handleDoubleClick = (event: React.MouseEvent) => {
-    // Only handle file upload blocks, let other double-clicks bubble up to ReactFlow
+    event.stopPropagation();
+    
+    // Handle file upload blocks first
     if (blockData?.category === 'input' && fileInputRef.current) {
       const hasFileConfig = Object.values(blockData?.config || {}).some(
         config => typeof config === 'object' && config.type === 'file'
       );
       
       if (hasFileConfig) {
-        event.stopPropagation();
         fileInputRef.current.click();
         return;
       }
     }
     
-    // For non-file blocks, don't stop propagation so ReactFlow can handle it
+    // For all other blocks, open the source code editor
+    setShowSourceCode(true);
   };
 
   // Handle file selection
@@ -323,6 +328,29 @@ const BlockNode: React.FC<NodeProps<BlockNodeData>> = ({ data, selected, id }) =
     
     // Clear the input for future selections
     event.target.value = '';
+  };
+
+  // Handle code editing
+  const handleStartEditing = () => {
+    setEditedCode(blockData.implementation || '# No implementation available\nprint("Block implementation pending...")');
+    setIsEditingCode(true);
+  };
+
+  const handleSaveCode = (newCode: string) => {
+    // Update the block data with new code
+    if (data && blockData) {
+      blockData.implementation = newCode;
+      // If there's an onEdit callback, call it
+      if (data.onEdit) {
+        data.onEdit(id, { ...blockData, implementation: newCode });
+      }
+    }
+    setIsEditingCode(false);
+    console.log('Code saved for block:', blockData.name);
+  };
+
+  const handleCodeChange = (newCode: string) => {
+    setEditedCode(newCode);
   };
 
   // Keyboard shortcuts
@@ -574,12 +602,56 @@ const BlockNode: React.FC<NodeProps<BlockNodeData>> = ({ data, selected, id }) =
 
                 {/* Implementation Code */}
                 <div>
-                  <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">Implementation</h3>
-                  <div className="bg-gray-900 rounded-lg p-4 overflow-auto max-h-96">
-                    <pre className="text-green-400 text-sm font-mono whitespace-pre-wrap">
-                      {blockData.implementation || '# No implementation available\nprint("Block implementation pending...")'}
-                    </pre>
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="text-lg font-medium text-gray-900 dark:text-white">Implementation</h3>
+                    <div className="flex space-x-2">
+                      {!isEditingCode && (
+                        <button
+                          onClick={handleStartEditing}
+                          className="px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+                        >
+                          Edit Code
+                        </button>
+                      )}
+                      {isEditingCode && (
+                        <>
+                          <button
+                            onClick={() => handleSaveCode(editedCode)}
+                            className="px-3 py-1 text-sm bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
+                          >
+                            Save
+                          </button>
+                          <button
+                            onClick={() => setIsEditingCode(false)}
+                            className="px-3 py-1 text-sm bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors"
+                          >
+                            Cancel
+                          </button>
+                        </>
+                      )}
+                    </div>
                   </div>
+                  
+                  {isEditingCode ? (
+                    <div className="h-96 border border-gray-300 dark:border-gray-600 rounded-lg overflow-hidden">
+                      <AdvancedCodeEditor
+                        initialCode={editedCode}
+                        language="python"
+                        blockType={blockData.category || 'generic'}
+                        blockId={id || 'unknown'}
+                        onCodeChange={handleCodeChange}
+                        onSave={handleSaveCode}
+                        showAIAssistant={true}
+                        showVersionHistory={false}
+                      />
+                    </div>
+                  ) : (
+                    <div className="bg-gray-900 rounded-lg p-4 overflow-auto max-h-96">
+                      <pre className="text-green-400 text-sm font-mono whitespace-pre-wrap">
+                        {blockData.implementation || '# No implementation available\nprint("Block implementation pending...")'}
+                      </pre>
+                    </div>
+                  )}
                 </div>
 
                 {/* Configuration */}
