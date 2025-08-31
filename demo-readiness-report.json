@@ -1,0 +1,140 @@
+{
+  "timestamp": "2025-08-31T01:08:11.068Z",
+  "demoScore": 73,
+  "recommendation": "CAUTION: Demo has moderate risks - address critical issues first",
+  "summary": {
+    "demoScript": "warning",
+    "demoScenarios": "pass",
+    "backupPlans": "pass",
+    "preloadedData": "warning",
+    "performance": "pass",
+    "dependencies": "fail"
+  },
+  "details": {
+    "demoScript": {
+      "status": "warning",
+      "issues": [
+        "Demo script lacks backup plans"
+      ],
+      "recommendations": [
+        "Add contingency plans for potential failures",
+        "Ensure demo script fits 5-minute time limit"
+      ]
+    },
+    "demoScenarios": {
+      "status": "pass",
+      "tested": [
+        "Homepage Load",
+        "Workspace Navigation",
+        "Prompt Input Flow",
+        "Block Interaction",
+        "Export Functionality"
+      ],
+      "failed": []
+    },
+    "backupPlans": {
+      "status": "pass",
+      "prepared": [
+        "Demo components available at src/demo",
+        "Offline functionality for network failures",
+        "Error recovery mechanisms"
+      ],
+      "missing": []
+    },
+    "preloadedData": {
+      "status": "warning",
+      "datasets": [
+        {
+          "file": "src/data/AIBlockExamples.ts",
+          "size": "0.0KB",
+          "type": "Text",
+          "valid": false
+        },
+        {
+          "file": "src/data/DemoWorkflows.ts",
+          "size": "19.3KB",
+          "type": "CSV",
+          "valid": true
+        }
+      ],
+      "issues": [
+        "No realistic demo datasets found"
+      ]
+    },
+    "performance": {
+      "status": "pass",
+      "metrics": {
+        "bundleSize": "0.48MB",
+        "jsFiles": 1,
+        "cssFiles": 1,
+        "hasLazyLoading": true,
+        "hasCaching": true
+      },
+      "issues": []
+    },
+    "dependencies": {
+      "status": "fail",
+      "external": [
+        "External API: https://github.com/username/${options.name}",
+        "External API: https://github.com/username/${options.name}/issues",
+        "External API: https://github.com/username/${options.name}",
+        "External API: https://github.com/username/${options.name}#readme",
+        "External API: https://discord.gg/example)",
+        "External API: https://github.com/username/${options.name}/issues)",
+        "External API: https://docs.example.com)",
+        "External API: https://github.com/username/${options.name}}",
+        "External API: https://huggingface.co/spaces/YOUR_USERNAME/YOUR_SPACE",
+        "External API: https://huggingface.co/spaces/YOUR_USERNAME/${options.name}}",
+        "External API: http://graphml.graphdrawing.org/xmlns",
+        "Environment variables required"
+      ],
+      "risks": [
+        "Demo depends on external service: https://github.com/username/${options.name}",
+        "Demo depends on external service: https://github.com/username/${options.name}/issues",
+        "Demo depends on external service: https://github.com/username/${options.name}",
+        "Demo depends on external service: https://github.com/username/${options.name}#readme",
+        "Demo depends on external service: https://discord.gg/example)",
+        "Demo depends on external service: https://github.com/username/${options.name}/issues)",
+        "Demo depends on external service: https://docs.example.com)",
+        "Demo depends on external service: https://github.com/username/${options.name}}",
+        "Demo depends on external service: https://huggingface.co/spaces/YOUR_USERNAME/YOUR_SPACE",
+        "Demo depends on external service: https://huggingface.co/spaces/YOUR_USERNAME/${options.name}}",
+        "Demo depends on external service: http://graphml.graphdrawing.org/xmlns",
+        "Demo may fail if environment variables not properly configured"
+      ]
+    }
+  },
+  "criticalActions": [
+    {
+      "category": "dependencies",
+      "priority": "CRITICAL",
+      "issues": [
+        "Demo depends on external service: https://github.com/username/${options.name}",
+        "Demo depends on external service: https://github.com/username/${options.name}/issues",
+        "Demo depends on external service: https://github.com/username/${options.name}",
+        "Demo depends on external service: https://github.com/username/${options.name}#readme",
+        "Demo depends on external service: https://discord.gg/example)",
+        "Demo depends on external service: https://github.com/username/${options.name}/issues)",
+        "Demo depends on external service: https://docs.example.com)",
+        "Demo depends on external service: https://github.com/username/${options.name}}",
+        "Demo depends on external service: https://huggingface.co/spaces/YOUR_USERNAME/YOUR_SPACE",
+        "Demo depends on external service: https://huggingface.co/spaces/YOUR_USERNAME/${options.name}}",
+        "Demo depends on external service: http://graphml.graphdrawing.org/xmlns",
+        "Demo may fail if environment variables not properly configured"
+      ],
+      "recommendations": []
+    }
+  ],
+  "demoChecklist": [
+    "☐ Build application (npm run build)",
+    "☐ Test demo flow end-to-end",
+    "☐ Prepare backup data files",
+    "☐ Check internet connectivity requirements",
+    "☐ Verify all demo scenarios work",
+    "☐ Practice demo timing (5 minutes)",
+    "☐ Prepare answers for common questions",
+    "☐ Have backup plans ready for failures",
+    "☐ Test on demo environment/hardware",
+    "☐ Validate all external dependencies work"
+  ]
+}

@@ -1,0 +1,133 @@
+{
+  "timestamp": "2025-08-31T01:08:10.885Z",
+  "overallScore": 75,
+  "recommendation": "GOOD: Strong user experience with minor improvements needed",
+  "summary": {
+    "uiIntuition": 65,
+    "responsiveDesign": 100,
+    "loadingStates": 60,
+    "errorMessages": 50,
+    "visualDesign": 100,
+    "animations": 90,
+    "accessibility": 60
+  },
+  "details": {
+    "uiIntuition": {
+      "score": 65,
+      "issues": [
+        "Only 20.4% of buttons have proper states",
+        "Only 50.0% of forms have validation"
+      ],
+      "recommendations": [
+        "Add hover, active, and disabled states to all buttons",
+        "Implement form validation with clear error messages"
+      ],
+      "metrics": {
+        "buttonStatePercentage": "20.4%",
+        "formValidationPercentage": "50.0%",
+        "tooltipUsage": 3,
+        "helpTextUsage": 10
+      }
+    },
+    "responsiveDesign": {
+      "score": 100,
+      "issues": [],
+      "recommendations": [],
+      "metrics": {
+        "responsiveClassUsage": 31,
+        "fixedWidthUsage": 0,
+        "mediaQueryUsage": 1,
+        "hasMobileFirst": true
+      }
+    },
+    "loadingStates": {
+      "score": 60,
+      "issues": [
+        "Low loading state coverage (0.6%)"
+      ],
+      "recommendations": [
+        "Add loading states to all async operations",
+        "Consider adding skeleton components for better perceived performance"
+      ],
+      "metrics": {
+        "loadingCoverage": "0.6%",
+        "asyncOperations": 177,
+        "loadingStateUsage": 1,
+        "skeletonUsage": 0,
+        "progressIndicatorUsage": 7
+      }
+    },
+    "errorMessages": {
+      "score": 50,
+      "issues": [
+        "Only 4.3% of error messages are user-friendly",
+        "Only 13.0% of error messages provide actionable guidance",
+        "No error boundaries detected"
+      ],
+      "recommendations": [
+        "Rewrite error messages in plain, user-friendly language",
+        "Add clear next steps to all error messages",
+        "Implement error boundaries for graceful error handling"
+      ],
+      "metrics": {
+        "errorHandlingPercentage": "52.0%",
+        "totalErrorMessages": 23,
+        "userFriendlyPercentage": "4.3%",
+        "actionablePercentage": "13.0%",
+        "hasErrorBoundary": false
+      }
+    },
+    "visualDesign": {
+      "score": 100,
+      "issues": [],
+      "recommendations": [],
+      "metrics": {
+        "colorUsage": 2037,
+        "typographyUsage": 428,
+        "spacingConsistency": 337,
+        "customStyling": 21,
+        "hasDesignSystem": true
+      }
+    },
+    "animations": {
+      "score": 90,
+      "issues": [],
+      "recommendations": [
+        "Respect user motion preferences for accessibility"
+      ],
+      "metrics": {
+        "transitionUsage": 43,
+        "animationUsage": 34,
+        "performantAnimations": 40,
+        "microInteractions": 39,
+        "respectsMotionPreferences": false
+      }
+    },
+    "accessibility": {
+      "score": 60,
+      "issues": [
+        "Insufficient ARIA labels for screen readers",
+        "No alt texts found for images"
+      ],
+      "recommendations": [
+        "Add ARIA labels to interactive elements and complex components",
+        "Add descriptive alt text to all images"
+      ],
+      "metrics": {
+        "semanticElements": 135,
+        "ariaLabels": 2,
+        "keyboardNavigation": 3,
+        "altTexts": 0,
+        "colorOnlyReliance": 0,
+        "hasFocusManagement": true
+      }
+    }
+  },
+  "criticalIssues": [
+    "Poor error handling may confuse users during demo"
+  ],
+  "quickWins": [
+    "Add loading spinners to async operations for better perceived performance",
+    "Improve error message wording to be more user-friendly"
+  ]
+}

@@ -1,0 +1,112 @@
+{
+  "timestamp": "2025-08-31T01:08:10.587Z",
+  "overallScore": 78,
+  "recommendation": "GO: Good production readiness with minor improvements needed",
+  "summary": {
+    "codeQuality": 50,
+    "security": 55,
+    "performance": 100,
+    "scalability": 75,
+    "reliability": 100,
+    "maintainability": 90
+  },
+  "details": {
+    "codeQuality": {
+      "score": 50,
+      "issues": [
+        "Assessment partially failed"
+      ],
+      "recommendations": []
+    },
+    "security": {
+      "score": 55,
+      "vulnerabilities": [
+        "eval() usage found in 4 files",
+        "dangerouslySetInnerHTML usage found in 1 files",
+        "Insecure HTTP URLs found in 1 files"
+      ],
+      "recommendations": [
+        "Replace eval() with safer alternatives",
+        "Sanitize HTML content or use safer rendering methods",
+        "Replace HTTP URLs with HTTPS",
+        "Ensure sensitive environment variables are not committed to version control"
+      ],
+      "checkedItems": [
+        "Package vulnerabilities",
+        "Code injection patterns",
+        "Insecure HTTP usage",
+        "Environment variable exposure"
+      ]
+    },
+    "performance": {
+      "score": 100,
+      "metrics": {
+        "bundleSizeMB": "0.39",
+        "largeFiles": 0,
+        "inlineStyleFiles": 1,
+        "unoptimizedImageFiles": 0,
+        "hasOptimizations": "Yes"
+      },
+      "recommendations": []
+    },
+    "scalability": {
+      "score": 75,
+      "concerns": [
+        "No centralized state management detected",
+        "No error boundaries detected"
+      ],
+      "recommendations": [
+        "Consider implementing Redux, Zustand, or Context API for state management",
+        "Implement error boundaries for better user experience"
+      ],
+      "checkedAspects": [
+        "State management",
+        "Component organization",
+        "API integration",
+        "Error handling",
+        "Testing infrastructure"
+      ]
+    },
+    "reliability": {
+      "score": 100,
+      "issues": [],
+      "recommendations": [],
+      "metrics": {
+        "errorHandlingPercentage": "60.7%",
+        "asyncFunctions": 51,
+        "hasLogging": true,
+        "hasLoadingStates": true
+      }
+    },
+    "maintainability": {
+      "score": 90,
+      "metrics": {
+        "documentation": {
+          "readme": true,
+          "changelog": false,
+          "contributing": false
+        },
+        "srcStructure": {
+          "hasComponents": true,
+          "hasServices": true,
+          "hasUtils": false,
+          "hasTypes": true,
+          "hasTests": true
+        },
+        "commentDensity": "4.6%",
+        "typeScriptUsage": "100.0%"
+      },
+      "recommendations": [
+        "Add more code comments for better maintainability"
+      ]
+    }
+  },
+  "priorityActions": [
+    {
+      "category": "Security",
+      "priority": "HIGH",
+      "action": "Address security vulnerabilities",
+      "impact": "Critical for production deployment"
+    }
+  ]
+}

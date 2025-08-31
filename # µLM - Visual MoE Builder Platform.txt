@@ -1,0 +1,297 @@
+# µLM - Visual MoE Builder Platform
+## Microsoft Copilot Prompts for 20-Hour Hackathon Victory
+
+### PROJECT OVERVIEW
+**µLM** (Micro Language Models) - A visual IDE for building, testing, and deploying custom AI systems using drag-drop MoE architecture with AI-powered expert generation.
+
+---
+
+## PHASE 1: FOUNDATION (Hours 0-4)
+
+### Prompt 1.1: Project Structure Setup
+```
+Create a monorepo structure for a React + FastAPI application called µLM with the following requirements:
+- Frontend: React 18 + TypeScript + Tailwind CSS + React Flow
+- Backend: FastAPI + SQLite + Redis (optional)
+- Shared: Component definitions and types
+- Docker setup for development
+- Lightweight, hackathon-optimized structure
+- Include package.json, requirements.txt, and docker-compose.yml
+- Keep dependencies minimal but production-ready
+```
+
+### Prompt 1.2: React Flow Canvas Foundation
+```
+Build a React Flow canvas component for µLM with these exact features:
+- Draggable component palette on the left sidebar
+- Main canvas area for workflow building  
+- Component types: DataInput, MLExpert, Router, Output, Custom
+- Each node should have input/output connection points
+- Smooth animations and professional styling with Tailwind
+- Node deletion, selection, and basic configuration panels
+- Export workflow as JSON functionality
+- Mobile-responsive design
+- Keep code lightweight and well-commented
+```
+
+### Prompt 1.3: FastAPI Backend Structure
+```
+Create a minimal FastAPI backend for µLM with these endpoints:
+- POST /workflows - Save workflow configurations
+- GET /workflows/{id} - Retrieve workflow
+- POST /simulate - Execute workflow simulation
+- POST /generate-expert - AI-powered expert generation
+- POST /export - Export workflow to various formats
+- Include CORS middleware, Pydantic models
+- SQLite for persistence, in-memory fallback
+- Error handling and request validation
+- Async support for long-running operations
+- Keep it lightweight but scalable
+```
+
+---
+
+## PHASE 2: CORE FEATURES (Hours 4-12)
+
+### Prompt 2.1: Pre-trained Expert Library
+```
+Create a comprehensive expert library system for µLM with these components:
+
+1. Expert Base Class with standardized interface
+2. Pre-built experts for:
+   - Text: BERT classification, sentiment analysis, NER
+   - Vision: Image classification, object detection  
+   - Audio: Speech recognition, audio classification
+   - Multimodal: CLIP, image captioning
+   - RAG: Document retrieval, question answering
+   - Classical ML: Linear regression, random forest, clustering
+
+Each expert should:
+- Have metadata (input/output types, description, parameters)
+- Support batch processing
+- Include error handling
+- Be serializable for workflow export
+- Have mock execution mode for simulation
+- Use HuggingFace transformers where applicable
+- Keep memory footprint minimal
+```
+
+### Prompt 2.2: AI Expert Generator
+```
+Build an AI-powered expert generator for µLM that:
+- Takes natural language description of needed expert
+- Analyzes existing expert patterns and configurations
+- Generates Python code for custom expert class
+- Validates generated code syntax and compatibility
+- Packages expert into draggable component
+- Adds to user's component palette automatically
+- Uses OpenAI API efficiently (minimize token usage)
+- Includes fallback templates for common patterns
+- Has proper error handling and user feedback
+- Supports iterative refinement of generated experts
+```
+
+### Prompt 2.3: Workflow Execution Engine
+```
+Create a workflow execution engine for µLM with these capabilities:
+- Parse React Flow workflow JSON into execution DAG
+- Handle parallel and sequential expert execution
+- Support data streaming between components
+- Mock execution mode for simulation (no actual ML inference)
+- Real execution mode with actual model calls
+- Progress tracking and performance metrics
+- Error handling and graceful degradation
+- Memory-efficient data passing
+- Support for conditional routing and loops
+- Async execution with WebSocket progress updates
+```
+
+---
+
+## PHASE 3: SIMULATION & UX (Hours 12-18)
+
+### Prompt 3.1: LabVIEW-Style Simulation
+```
+Build a real-time simulation system for µLM inspired by LabVIEW and Cisco Packet Tracer:
+- Animate data flowing through workflow connections
+- Highlight active components during execution
+- Show performance metrics (latency, throughput, memory)
+- Step-by-step debugging with breakpoints
+- Data inspection at each component
+- Performance bottleneck visualization
+- Resource utilization graphs
+- Error injection and fault tolerance testing
+- Playback controls (play, pause, step, reset)
+- Export simulation results and metrics
+```
+
+### Prompt 3.2: Component Configuration System
+```
+Create an advanced component configuration system for µLM:
+- Double-click to open component source code editor
+- Syntax highlighting and error checking
+- Parameter validation and type checking
+- Real-time configuration preview
+- Template-based parameter forms
+- Version control for component modifications
+- Rollback to original configuration
+- Share custom configurations with team
+- Export modified components as new experts
+- Integration with AI expert generator for refinements
+```
+
+### Prompt 3.3: Auto-Build AI Assistant
+```
+Develop an AI assistant for µLM that can automatically build workflows:
+- Parse user's natural language requirements
+- Suggest optimal MoE architecture patterns
+- Auto-place and wire components on canvas
+- Provide step-by-step building instructions
+- Explain design decisions and trade-offs
+- Offer optimization suggestions
+- Support conversational refinement
+- Generate documentation for built workflows
+- Include best practices and common patterns
+- Minimize OpenAI API calls through smart caching
+```
+
+---
+
+## PHASE 4: DEPLOYMENT & POLISH (Hours 18-20)
+
+### Prompt 4.1: Universal Export System
+```
+Build a comprehensive export system for µLM workflows:
+
+Export Formats:
+1. HuggingFace Hub - Complete model repository with inference API
+2. Python Package - Pip-installable with CLI interface
+3. Docker Container - Production-ready microservice
+4. FastAPI Template - Deployment-ready web service
+5. Jupyter Notebook - Educational/research format
+6. ONNX Runtime - Edge deployment optimization
+
+Requirements:
+- Generate complete, working code for each format
+- Include proper requirements.txt/dependencies
+- Add deployment documentation
+- Include example usage and API documentation
+- Support environment variable configuration
+- Handle model downloading and caching
+- Include monitoring and logging setup
+```
+
+### Prompt 4.2: Demo-Ready Features
+```
+Create demo-optimized features for µLM hackathon presentation:
+- Pre-built workflow templates (sentiment analysis, document QA, multimodal search)
+- One-click template loading with explanatory tooltips
+- Smooth workflow animations and transitions
+- Performance dashboard with impressive metrics
+- AI assistant conversation examples
+- Export preview with generated code snippets
+- Mobile-responsive design for judging on different devices
+- Dark/light theme toggle
+- Loading states and micro-interactions
+- Error states with helpful recovery suggestions
+```
+
+---
+
+## RESOURCE OPTIMIZATION STRATEGIES
+
+### OpenAI API Efficiency ($50 budget)
+```
+Implement smart OpenAI usage for µLM:
+- Cache generated experts locally to avoid regeneration
+- Use GPT-3.5-turbo for most tasks, GPT-4 only for complex expert generation
+- Template-based generation with parameter substitution
+- Batch multiple requests when possible
+- Implement request deduplication
+- Use shorter, more efficient prompts
+- Local fallback templates when API budget exhausted
+- Progress tracking to monitor credit usage
+- Graceful degradation when limits reached
+```
+
+### Infrastructure Optimization ($100 budget)
+```
+Design lightweight infrastructure for µLM:
+- Use Redis only for caching, SQLite for persistence
+- Implement lazy loading for expert models
+- Use model quantization for memory efficiency
+- Container image optimization (multi-stage Docker builds)
+- Client-side simulation when possible
+- Efficient asset bundling and compression
+- CDN-friendly static asset organization
+- Database query optimization
+- Memory-mapped file access for large models
+```
+
+---
+
+## WINNING DEMO SCRIPT
+
+### 5-Minute Presentation Flow
+```
+Create presentation materials for µLM demo:
+
+Minute 1 - Problem Statement:
+"Building AI systems requires deep ML expertise. Teams spend months on infrastructure instead of innovation."
+
+Minutes 2-3 - Live Demo:
+1. "Let's build a smart document analysis system"
+2. Drag: Document Parser → Text Expert → Summary Expert → Output
+3. "Need custom behavior?" → AI generates custom expert
+4. "Let's test it" → Run simulation with visual data flow
+5. "Deploy it" → Export to HuggingFace in one click
+
+Minute 4 - Technical Innovation:
+- Visual MoE architecture builder (first of its kind)
+- AI-powered infinite extensibility
+- Production-ready export pipeline
+
+Minute 5 - Business Impact:
+- Reduces AI development time from months to hours
+- Democratizes AI system building
+- Scalable SaaS platform with marketplace potential
+```
+
+---
+
+## DEVELOPMENT PRIORITY MATRIX
+
+### MUST-HAVE (Critical for winning)
+1. ✅ **Visual workflow builder** - React Flow with 8+ expert types
+2. ✅ **AI expert generator** - Natural language → custom component
+3. ✅ **Simulation environment** - Animated execution with metrics
+4. ✅ **Export functionality** - At least 2 formats (Python, Docker)
+
+### SHOULD-HAVE (Nice for demo)
+1. ⚠️ **Auto-build AI assistant** - Prompt → complete workflow
+2. ⚠️ **Component marketplace** - Share/discover experts
+3. ⚠️ **Advanced simulation** - Breakpoints, debugging
+
+### COULD-HAVE (Post-hackathon)
+1. ❌ **Team collaboration** - Skip for hackathon
+2. ❌ **Advanced deployment** - Keep exports simple
+3. ❌ **Enterprise features** - Focus on developer experience
+
+---
+
+## SUCCESS METRICS
+
+### Technical KPIs for Judges
+- **Workflow Complexity**: Support 10+ component workflows
+- **Generation Speed**: <30 seconds for AI expert creation
+- **Simulation Performance**: <5 seconds for workflow execution
+- **Export Quality**: Generated code passes basic syntax checks
+- **User Experience**: Smooth, intuitive interface
+
+### Business Metrics for Presentation
+- **Time Savings**: "Build in hours, not months"
+- **Accessibility**: "No PhD in ML required"
+- **Scalability**: "Infinite experts through AI generation"
+- **Market Size**: "Every company building AI needs this"
+
+**FINAL NOTE**: Use these prompts with Copilot incrementally. Test each component before moving to the next. Focus on making each piece work perfectly rather than building everything at once. Your winning factor is execution quality, not feature quantity.
