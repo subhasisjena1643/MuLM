@@ -22,6 +22,7 @@ import 'reactflow/dist/style.css';
 import BlockPalette from '../components/BlockPalette';
 import BlockNode from '../components/BlockNode';
 import AIBlockGenerator from '../components/AIBlockGenerator';
+import { WorkspaceRightPanel } from '../components/workspace/WorkspaceRightPanel';
 
 // Services
 import { AIBlockGenerationService } from '../services/AIBlockGenerationService';
@@ -608,6 +609,8 @@ const EnhancedMoEWorkspace: React.FC<WorkspaceProps> = ({ isDark, onThemeToggle 
   const [showConfigPanel, setShowConfigPanel] = useState(false);
   const [showSimulationPanel, setShowSimulationPanel] = useState(false);
   const [showCodeEditor, setShowCodeEditor] = useState(false);
+  const [showRightPanel, setShowRightPanel] = useState(false);
+  const [rightPanelWidth, setRightPanelWidth] = useState(400);
   const [backgroundVariant, setBackgroundVariant] = useState<'dots' | 'lines' | 'cross'>('dots');
   
   console.log('✅ UI state initialized');
@@ -1323,7 +1326,8 @@ const EnhancedMoEWorkspace: React.FC<WorkspaceProps> = ({ isDark, onThemeToggle 
 
   const onNodeDoubleClick = useCallback((event: React.MouseEvent, node: Node) => {
     setSelectedNode(node);
-    setShowCodeEditor(true);
+    setShowRightPanel(true);
+    setShowCodeEditor(false); // Close modal if open
   }, []);
 
   // Add AI-generated expert to palette
@@ -2219,50 +2223,16 @@ const EnhancedMoEWorkspace: React.FC<WorkspaceProps> = ({ isDark, onThemeToggle 
           </div>
         )}
 
-        {/* Code Editor Modal */}
-        {showCodeEditor && selectedNode && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-hidden">
-              <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-                    <span>{Icons.Code}</span>
-                    Edit Block: {selectedNode.data?.label || selectedNode.id}
-                  </h3>
-                  <button
-                    onClick={() => setShowCodeEditor(false)}
-                    className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-                  >
-                    ✕
-                  </button>
-                </div>
-              </div>
-              <div className="p-4 h-96 overflow-y-auto">
-                <textarea
-                  className="w-full h-full p-4 border border-gray-200 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white font-mono text-sm"
-                  defaultValue={selectedNode.data?.implementation || '# Block implementation code here\npass'}
-                  placeholder="Enter block implementation code..."
-                />
-              </div>
-              <div className="p-4 border-t border-gray-200 dark:border-gray-700 flex gap-3">
-                <button
-                  onClick={() => setShowCodeEditor(false)}
-                  className={`flex-1 px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 ${smoothTransition}`}
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={() => {
-                    // Save implementation logic here
-                    setShowCodeEditor(false);
-                  }}
-                  className={`flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 ${smoothTransition}`}
-                >
-                  Save Changes
-                </button>
-              </div>
-            </div>
-          </div>
+        {/* Right Panel - Code Editor */}
+        {showRightPanel && (
+          <WorkspaceRightPanel
+            isOpen={showRightPanel}
+            onClose={() => setShowRightPanel(false)}
+            selectedNode={selectedNode}
+            width={rightPanelWidth}
+            onWidthChange={setRightPanelWidth}
+            isDark={isDark}
+          />
         )}
       </ReactFlowProvider>
     </div>

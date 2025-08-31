@@ -5,6 +5,7 @@
  */
 
 import { BlockDefinition, BlockCategory, Port, ConfigParameter } from '../types/GridTypes';
+import { DataLoaderBlock, SentimentAnalysisBlock, DataVisualizerBlock } from '../../data/AIBlockExamples';
 
 // =============================================================================
 // INPUT BLOCKS
@@ -85,7 +86,10 @@ export const InputBlocks: Record<string, BlockDefinition> = {
     tags: ['api', 'http', 'data'],
     performance: { avgExecutionTime: 1000, memoryUsage: 'medium' },
     errorHandling: { retryable: true, timeout: 30000 }
-  }
+  },
+
+  // Enhanced example blocks with real implementations
+  dataLoader: DataLoaderBlock
 };
 
 // =============================================================================
@@ -176,7 +180,10 @@ export const MLAlgorithmBlocks: Record<string, BlockDefinition> = {
     tags: ['clustering', 'unsupervised', 'kmeans'],
     performance: { avgExecutionTime: 150, memoryUsage: 'medium' },
     errorHandling: { retryable: true, timeout: 45000 }
-  }
+  },
+
+  // Enhanced example blocks with real implementations
+  sentimentAnalysis: SentimentAnalysisBlock
 };
 
 // =============================================================================
@@ -434,7 +441,10 @@ export const OutputBlocks: Record<string, BlockDefinition> = {
     tags: ['model', 'export', 'save', 'output'],
     performance: { avgExecutionTime: 300, memoryUsage: 'medium' },
     errorHandling: { retryable: true, timeout: 120000 }
-  }
+  },
+
+  // Enhanced example blocks with real implementations
+  dataVisualizer: DataVisualizerBlock
 };
 
 // =============================================================================

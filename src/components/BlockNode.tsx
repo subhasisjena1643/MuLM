@@ -8,7 +8,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Handle, Position, NodeProps } from 'reactflow';
 import { Settings, Play, Pause, AlertCircle, CheckCircle, Clock, Info, X, Maximize, Minimize } from 'lucide-react';
-import { AdvancedCodeEditor } from './editor/AdvancedCodeEditor';
 import { BlockDefinition, Port } from '../storage/types/GridTypes';
 
 interface BlockNodeData {
@@ -155,9 +154,8 @@ const BlockNode: React.FC<NodeProps<BlockNodeData>> = ({ data, selected, id }) =
   const [isConfigOpen, setIsConfigOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
-  const [showSourceCode, setShowSourceCode] = useState(false);
-  const [isEditingCode, setIsEditingCode] = useState(false);
-  const [editedCode, setEditedCode] = useState('');
+  const [blockSize, setBlockSize] = useState({ width: 240, height: 'auto' });
+  const [isResizing, setIsResizing] = useState(false);
   const [localConfig, setLocalConfig] = useState(() => {
     return data?.config || (blockData && blockData.config) || {};
   });
@@ -278,7 +276,7 @@ const BlockNode: React.FC<NodeProps<BlockNodeData>> = ({ data, selected, id }) =
     }
   };
 
-  // Handle double-click for input blocks to trigger file upload, for other blocks to open code editor
+  // Handle double-click for input blocks to trigger file upload, for other blocks to select for right panel editing
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   const handleDoubleClick = (event: React.MouseEvent) => {
@@ -296,8 +294,9 @@ const BlockNode: React.FC<NodeProps<BlockNodeData>> = ({ data, selected, id }) =
       }
     }
     
-    // For all other blocks, open the source code editor
-    setShowSourceCode(true);
+    // For all other blocks, trigger selection to open in right panel
+    // This will be handled by the parent workspace component
+    console.log('Block double-clicked for code editing:', blockData.name);
   };
 
   // Handle file selection
@@ -330,28 +329,50 @@ const BlockNode: React.FC<NodeProps<BlockNodeData>> = ({ data, selected, id }) =
     event.target.value = '';
   };
 
-  // Handle code editing
-  const handleStartEditing = () => {
-    setEditedCode(blockData.implementation || '# No implementation available\nprint("Block implementation pending...")');
-    setIsEditingCode(true);
-  };
+  // Handle block resizing
+  const handleMouseDown = (e: React.MouseEvent, direction: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsResizing(true);
+    
+    const startX = e.clientX;
+    const startY = e.clientY;
+    const startWidth = blockSize.width;
+    const startHeight = typeof blockSize.height === 'number' ? blockSize.height : 200;
 
-  const handleSaveCode = (newCode: string) => {
-    // Update the block data with new code
-    if (data && blockData) {
-      blockData.implementation = newCode;
-      // If there's an onEdit callback, call it
-      if (data.onEdit) {
-        data.onEdit(id, { ...blockData, implementation: newCode });
+    const handleMouseMove = (e: MouseEvent) => {
+      const deltaX = e.clientX - startX;
+      const deltaY = e.clientY - startY;
+      
+      let newWidth = startWidth;
+      let newHeight = startHeight;
+      
+      if (direction.includes('right')) {
+        newWidth = Math.max(180, startWidth + deltaX);
       }
-    }
-    setIsEditingCode(false);
-    console.log('Code saved for block:', blockData.name);
+      if (direction.includes('left')) {
+        newWidth = Math.max(180, startWidth - deltaX);
+      }
+      if (direction.includes('bottom')) {
+        newHeight = Math.max(120, startHeight + deltaY);
+      }
+      if (direction.includes('top')) {
+        newHeight = Math.max(120, startHeight - deltaY);
+      }
+      
+      setBlockSize({ width: newWidth, height: newHeight });
+    };
+
+    const handleMouseUp = () => {
+      setIsResizing(false);
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
   };
 
-  const handleCodeChange = (newCode: string) => {
-    setEditedCode(newCode);
-  };
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -379,12 +400,15 @@ const BlockNode: React.FC<NodeProps<BlockNodeData>> = ({ data, selected, id }) =
   return (
     <div
       ref={nodeRef}
-      className={`relative bg-white rounded-lg shadow-md border-2 transition-all duration-200 select-none
+      className={`group relative bg-white rounded-lg shadow-md border-2 transition-all duration-200 select-none
         ${selected ? 'border-blue-400 shadow-lg' : 'border-gray-300 hover:border-gray-400'}
-        ${data.isExecuting ? 'animate-pulse' : ''}`}
+        ${data.isExecuting ? 'animate-pulse' : ''}
+        ${isResizing ? 'cursor-nw-resize' : ''}`}
       style={{ 
-        width: isMinimized ? 180 : 240,
-        minHeight: 60
+        width: isMinimized ? 180 : blockSize.width,
+        height: isMinimized ? 'auto' : blockSize.height,
+        minHeight: 60,
+        minWidth: 180
       }}
       onDoubleClick={handleDoubleClick}
       title={blockData?.category === 'input' ? 'Double-click to upload file' : undefined}
@@ -424,9 +448,9 @@ const BlockNode: React.FC<NodeProps<BlockNodeData>> = ({ data, selected, id }) =
             {!isMinimized && (
               <>
                 <button
-                  onClick={() => setShowSourceCode(true)}
+                  onClick={() => console.log('Opening in right panel:', blockData.name)}
                   className="text-white/80 hover:text-white hover:bg-white/20 rounded p-1 transition-colors"
-                  title="View Source Code"
+                  title="View Code in Panel"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
@@ -556,156 +580,37 @@ const BlockNode: React.FC<NodeProps<BlockNodeData>> = ({ data, selected, id }) =
         </div>
       ))}
 
-      {/* Source Code Modal */}
-      {showSourceCode && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-4xl w-full mx-4 max-h-[80vh] overflow-hidden">
-            {/* Header */}
-            <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
-              <div className="flex items-center space-x-3">
-                <svg className="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
-                </svg>
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                  {blockData.name} - Source Code
-                </h2>
-              </div>
-              <button
-                onClick={() => setShowSourceCode(false)}
-                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-              >
-                <X className="h-6 w-6" />
-              </button>
-            </div>
-
-            {/* Content */}
-            <div className="p-6">
-              <div className="space-y-4">
-                {/* Block Info */}
-                <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
-                  <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">Block Information</h3>
-                  <div className="grid grid-cols-2 gap-4 text-sm">
-                    <div>
-                      <span className="font-medium text-gray-700 dark:text-gray-300">Name:</span>
-                      <span className="ml-2 text-gray-900 dark:text-white">{blockData.name}</span>
-                    </div>
-                    <div>
-                      <span className="font-medium text-gray-700 dark:text-gray-300">Category:</span>
-                      <span className="ml-2 text-gray-900 dark:text-white">{blockData.category}</span>
-                    </div>
-                    <div className="col-span-2">
-                      <span className="font-medium text-gray-700 dark:text-gray-300">Description:</span>
-                      <span className="ml-2 text-gray-900 dark:text-white">{blockData.description}</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Implementation Code */}
-                <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <h3 className="text-lg font-medium text-gray-900 dark:text-white">Implementation</h3>
-                    <div className="flex space-x-2">
-                      {!isEditingCode && (
-                        <button
-                          onClick={handleStartEditing}
-                          className="px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
-                        >
-                          Edit Code
-                        </button>
-                      )}
-                      {isEditingCode && (
-                        <>
-                          <button
-                            onClick={() => handleSaveCode(editedCode)}
-                            className="px-3 py-1 text-sm bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
-                          >
-                            Save
-                          </button>
-                          <button
-                            onClick={() => setIsEditingCode(false)}
-                            className="px-3 py-1 text-sm bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors"
-                          >
-                            Cancel
-                          </button>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                  
-                  {isEditingCode ? (
-                    <div className="h-96 border border-gray-300 dark:border-gray-600 rounded-lg overflow-hidden">
-                      <AdvancedCodeEditor
-                        initialCode={editedCode}
-                        language="python"
-                        blockType={blockData.category || 'generic'}
-                        blockId={id || 'unknown'}
-                        onCodeChange={handleCodeChange}
-                        onSave={handleSaveCode}
-                        showAIAssistant={true}
-                        showVersionHistory={false}
-                      />
-                    </div>
-                  ) : (
-                    <div className="bg-gray-900 rounded-lg p-4 overflow-auto max-h-96">
-                      <pre className="text-green-400 text-sm font-mono whitespace-pre-wrap">
-                        {blockData.implementation || '# No implementation available\nprint("Block implementation pending...")'}
-                      </pre>
-                    </div>
-                  )}
-                </div>
-
-                {/* Configuration */}
-                {blockData.config && Object.keys(blockData.config).length > 0 && (
-                  <div>
-                    <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">Configuration</h3>
-                    <div className="bg-gray-900 rounded-lg p-4 overflow-auto max-h-48">
-                      <pre className="text-blue-400 text-sm font-mono">
-                        {JSON.stringify(blockData.config, null, 2)}
-                      </pre>
-                    </div>
-                  </div>
-                )}
-
-                {/* Input/Output Ports */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">Input Ports</h3>
-                    <div className="space-y-2">
-                      {blockData.inputs.map((input) => (
-                        <div key={input.id} className="bg-gray-50 dark:bg-gray-700 rounded p-2">
-                          <div className="font-medium text-sm text-gray-900 dark:text-white">{input.name}</div>
-                          <div className="text-xs text-gray-600 dark:text-gray-400">{input.dataType} • {input.type}</div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">Output Ports</h3>
-                    <div className="space-y-2">
-                      {blockData.outputs.map((output) => (
-                        <div key={output.id} className="bg-gray-50 dark:bg-gray-700 rounded p-2">
-                          <div className="font-medium text-sm text-gray-900 dark:text-white">{output.name}</div>
-                          <div className="text-xs text-gray-600 dark:text-gray-400">{output.dataType} • {output.type}</div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Footer */}
-            <div className="flex items-center justify-end p-6 border-t border-gray-200 dark:border-gray-700">
-              <button
-                onClick={() => setShowSourceCode(false)}
-                className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600"
-              >
-                Close
-              </button>
+      {/* Resize Handles */}
+      {!isMinimized && (
+        <>
+          {/* Bottom-right corner resize handle */}
+          <div
+            className="absolute bottom-0 right-0 w-4 h-4 cursor-nw-resize bg-gray-300 hover:bg-gray-400 rounded-tl-lg opacity-0 group-hover:opacity-100 transition-opacity"
+            onMouseDown={(e) => handleMouseDown(e, 'bottom-right')}
+            title="Drag to resize"
+          >
+            <div className="absolute bottom-1 right-1 w-2 h-2">
+              <div className="w-full h-px bg-gray-600"></div>
+              <div className="w-px h-full bg-gray-600 ml-auto"></div>
             </div>
           </div>
-        </div>
+          
+          {/* Right edge resize handle */}
+          <div
+            className="absolute top-1/2 right-0 w-2 h-8 cursor-ew-resize bg-gray-300 hover:bg-gray-400 rounded-l opacity-0 hover:opacity-100 transition-opacity transform -translate-y-1/2"
+            onMouseDown={(e) => handleMouseDown(e, 'right')}
+            title="Drag to resize width"
+          />
+          
+          {/* Bottom edge resize handle */}
+          <div
+            className="absolute bottom-0 left-1/2 w-8 h-2 cursor-ns-resize bg-gray-300 hover:bg-gray-400 rounded-t opacity-0 hover:opacity-100 transition-opacity transform -translate-x-1/2"
+            onMouseDown={(e) => handleMouseDown(e, 'bottom')}
+            title="Drag to resize height"
+          />
+        </>
       )}
+
     </div>
   );
 };
